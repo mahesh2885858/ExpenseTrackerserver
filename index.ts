@@ -1,4 +1,6 @@
 import Fastify from "fastify";
+import register from "./routes/register.ts";
+
 const fastify = Fastify({
   logger: true,
 });
@@ -47,7 +49,8 @@ fastify.route({
   },
 });
 
-// Run the server!
+fastify.register(register);
+
 try {
   await fastify.listen({ port: 3000 });
   await fastify.ready();
