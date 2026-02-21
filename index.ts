@@ -1,9 +1,12 @@
+import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify from "fastify";
-import register from "./routes/register.ts";
+import user_registration from "./routes/register/register.route.ts";
+import AppError from "./utils/error.ts";
+import sqlite from "./plugins/sqlite.ts";
 
 const fastify = Fastify({
   logger: true,
-});
+}).withTypeProvider<TypeBoxTypeProvider>();
 
 await fastify.register(import("@fastify/swagger"));
 
@@ -29,27 +32,33 @@ await fastify.register(import("@fastify/swagger-ui"), {
   transformSpecificationClone: true,
 });
 
+fastify.setErrorHandler((error, req, reply) => {
+  if (error instanceof AppError) {
+    return reply.status(error.statusCode).send({
+      status: "error",
+      code: error.code,
+      message: error.message,
+    });
+  }
+
+  req.log.error(error);
+
+  return reply.status(500).send({
+    status: "error",
+    message: "Internal Server Error",
+  });
+});
+fastify.register(sqlite);
+
 fastify.route({
   method: "get",
   url: "/",
-  schema: {
-    response: {
-      200: {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-          },
-        },
-      },
-    },
-  },
   handler: function (req, res) {
-    return { name: "online" };
+    return { status: "online" };
   },
 });
 
-fastify.register(register);
+fastify.register(user_registration);
 
 try {
   await fastify.listen({ port: 3000 });
