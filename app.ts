@@ -1,0 +1,71 @@
+import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import Fastify from "fastify";
+import user_registration from "./routes/register/register.route.ts";
+import AppError from "./utils/error.ts";
+import sqlite from "./plugins/sqlite.ts";
+
+type buildOptions = {
+  docs?: boolean;
+};
+
+async function buildServer(options?: buildOptions) {
+  const fastify = Fastify({
+    logger: true,
+  }).withTypeProvider<TypeBoxTypeProvider>();
+  if (options?.docs) {
+    await fastify.register(import("@fastify/swagger"));
+
+    await fastify.register(import("@fastify/swagger-ui"), {
+      routePrefix: "/documentation",
+      uiConfig: {
+        docExpansion: "full",
+        deepLinking: false,
+      },
+      uiHooks: {
+        onRequest: function (request, reply, next) {
+          next();
+        },
+        preHandler: function (request, reply, next) {
+          next();
+        },
+      },
+      staticCSP: true,
+      transformStaticCSP: (header) => header,
+      transformSpecification: (swaggerObject, request, reply) => {
+        return swaggerObject;
+      },
+      transformSpecificationClone: true,
+    });
+  }
+  fastify.setErrorHandler((error, req, reply) => {
+    if (error instanceof AppError) {
+      return reply.status(error.statusCode).send({
+        status: "error",
+        code: error.code,
+        message: error.message,
+      });
+    }
+
+    req.log.error(error);
+
+    return reply.status(500).send({
+      status: "error",
+      message: "Internal Server Error",
+    });
+  });
+  fastify.register(sqlite);
+
+  fastify.route({
+    method: "get",
+    url: "/",
+    handler: function (req, res) {
+      return { status: "online" };
+    },
+  });
+
+  fastify.register(user_registration);
+
+  return fastify;
+}
+
+export default buildServer;
