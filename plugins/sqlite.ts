@@ -8,12 +8,18 @@ declare module "fastify" {
   }
 }
 
-async function sqlite(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  const db = new DatabaseSync("./db/dev.db");
-  fastify.decorate("db", db);
-  fastify.addHook("onClose", async () => {
-    db.close();
+async function sqlite(dbPath: string) {
+  return fp(async function (
+    fastify: FastifyInstance,
+    options: FastifyPluginOptions,
+  ) {
+    const db = new DatabaseSync(dbPath);
+    fastify.decorate("db", db);
+    fastify.addHook("onClose", async () => {
+      db.close();
+    });
+    fastify.log.info("Registering sqlite...");
   });
-  fastify.log.info("Registering sqlite...");
 }
-export default fp(sqlite);
+
+export default sqlite;

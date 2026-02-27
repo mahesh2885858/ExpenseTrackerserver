@@ -2,6 +2,7 @@ import buildServer from "./app.ts";
 
 const fastify = await buildServer({
   docs: true,
+  db: "./db/dev.db",
 });
 try {
   await fastify.listen({ port: 3000 });

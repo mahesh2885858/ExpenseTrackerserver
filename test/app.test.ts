@@ -2,9 +2,10 @@ import test, { type TestContext } from "node:test";
 import buildServer from "../app.ts";
 import AppError from "../utils/error.ts";
 
+const app = await buildServer({ db: ":memory:" });
+
 test('requesting the "/" route', async (t: TestContext) => {
   t.plan(1);
-  const app = await buildServer();
   const response = await app.inject({
     method: "GET",
     url: "/",
@@ -19,7 +20,7 @@ test('requesting the "/" route', async (t: TestContext) => {
 
 test("global App error handler", async (t: TestContext) => {
   t.plan(1);
-  const app = await buildServer();
+  const app = await buildServer({ db: ":memory:" });
   app.get("/throw-error", async () => {
     throw new AppError("Bad username", "BAD_USERNAME", 400);
   });
@@ -34,7 +35,7 @@ test("global App error handler", async (t: TestContext) => {
 
 test("global unknown error handler", async (t: TestContext) => {
   t.plan(1);
-  const app = await buildServer();
+  const app = await buildServer({ db: ":memory:" });
   app.get("/throw-unknown-error", async () => {
     throw new Error("Unknown error");
   });
@@ -45,4 +46,11 @@ test("global unknown error handler", async (t: TestContext) => {
     url: "/throw-unknown-error",
   });
   t.assert.equal(res.statusCode, 500);
+});
+
+test("close the connection and should close db", async (t: TestContext) => {
+  t.plan(1);
+  await app.close();
+  const isOpen = app.db.isOpen;
+  t.assert.equal(isOpen, false, "Data base is not closed yet!!!");
 });

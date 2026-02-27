@@ -1,14 +1,15 @@
 import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify from "fastify";
+import sqlite from "./plugins/sqlite.ts";
 import user_registration from "./routes/register/register.route.ts";
 import AppError from "./utils/error.ts";
-import sqlite from "./plugins/sqlite.ts";
 
 type buildOptions = {
+  db: string;
   docs?: boolean;
 };
 
-async function buildServer(options?: buildOptions) {
+async function buildServer(options: buildOptions) {
   const fastify = Fastify({
     logger: true,
   }).withTypeProvider<TypeBoxTypeProvider>();
@@ -53,8 +54,8 @@ async function buildServer(options?: buildOptions) {
       message: "Internal Server Error",
     });
   });
-  fastify.register(sqlite);
-
+  const db = await sqlite(options.db);
+  fastify.register(db);
   fastify.route({
     method: "get",
     url: "/",
