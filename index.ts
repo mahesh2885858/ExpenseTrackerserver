@@ -5,7 +5,7 @@ const fastify = await buildServer({
   db: "./db/dev.db",
 });
 try {
-  await fastify.listen({ port: 3000 });
+  fastify.listen({ port: parseInt(process.env.PORT) || 3000 });
   await fastify.ready();
 } catch (err) {
   fastify.log.error(err);
