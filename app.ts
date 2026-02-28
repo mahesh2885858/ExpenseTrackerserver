@@ -1,17 +1,19 @@
 import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify from "fastify";
-import sqlite from "./plugins/sqlite.ts";
+import createDatabasePlugin from "./plugins/createDatabasePlugin.ts";
 import user_registration from "./routes/register/register.route.ts";
 import AppError from "./utils/error.ts";
+import { DatabaseSync } from "node:sqlite";
 
 type buildOptions = {
-  db: string;
+  db: DatabaseSync;
   docs?: boolean;
+  logger: boolean;
 };
 
 async function buildServer(options: buildOptions) {
   const fastify = Fastify({
-    logger: true,
+    logger: options.logger,
   }).withTypeProvider<TypeBoxTypeProvider>();
   if (options?.docs) {
     await fastify.register(import("@fastify/swagger"));
@@ -54,8 +56,9 @@ async function buildServer(options: buildOptions) {
       message: "Internal Server Error",
     });
   });
-  const db = await sqlite(options.db);
-  fastify.register(db);
+
+  const dataBasePlugin = await createDatabasePlugin(options.db);
+  fastify.register(dataBasePlugin);
   fastify.route({
     method: "get",
     url: "/",

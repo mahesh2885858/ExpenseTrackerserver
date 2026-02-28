@@ -1,15 +1,16 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { fileURLToPath } from "node:url";
+import { runMigrations } from "./runMigrations";
 
 export async function initDb() {
   try {
-    const db = new DatabaseSync("./dev.db");
-    const filePath = resolve("schemas/init.sql");
-    const sql = await readFile(filePath, "utf-8");
-    console.log({ sql });
-    db.exec(sql);
-    console.log("Database is ready");
+    const dirName = import.meta.dirname;
+    const dbPath = path.join(dirName, "dev.db");
+    const db = new DatabaseSync(dbPath);
+    await runMigrations(db);
   } catch (Err) {
     console.log({ Err });
   }

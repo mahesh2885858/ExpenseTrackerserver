@@ -8,12 +8,11 @@ declare module "fastify" {
   }
 }
 
-async function sqlite(dbPath: string) {
+async function createDatabasePlugin(db: DatabaseSync) {
   return fp(async function (
     fastify: FastifyInstance,
     options: FastifyPluginOptions,
   ) {
-    const db = new DatabaseSync(dbPath);
     fastify.decorate("db", db);
     fastify.addHook("onClose", async () => {
       db.close();
@@ -22,4 +21,4 @@ async function sqlite(dbPath: string) {
   });
 }
 
-export default sqlite;
+export default createDatabasePlugin;

@@ -1,8 +1,10 @@
 import test, { type TestContext } from "node:test";
 import buildServer from "../app.ts";
 import AppError from "../utils/error.ts";
+import getTestDBInstance from "./getTestDb.ts";
 
-const app = await buildServer({ db: process.env.DB_TEST });
+const db = getTestDBInstance();
+const app = await buildServer({ db });
 
 test('requesting the "/" route', async (t: TestContext) => {
   t.plan(1);
