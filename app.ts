@@ -53,7 +53,7 @@ async function buildServer(options: buildOptions) {
 
     return reply.status(500).send({
       status: "error",
-      message: "Internal Server Error",
+      message: error.message ? error.message : String(error),
     });
   });
 
