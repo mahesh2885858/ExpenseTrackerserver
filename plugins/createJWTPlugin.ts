@@ -1,49 +1,16 @@
-import { createHash, createHmac } from "node:crypto";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import Jwt from "../lib/jwt.ts";
+import fp from "fastify-plugin";
 import AppError from "../utils/error.ts";
-class Jwt {
-  secret: string;
-  constructor(secret: string) {
-    this.secret = secret;
+
+const jwtPlugin = (fastify: FastifyInstance, options: FastifyPluginOptions) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length === 0) {
+    throw new AppError("No secret provided for JWT.", "NO_SECRET", 500);
   }
-  init() {
-    if (this.secret.trim().length <= 0) {
-      throw new AppError("No valid signature is provided", "NO_SECRET", 500);
-    }
-  }
-  encode(payload: Record<string, any>) {
-    const header = {
-      typ: "JWT",
-      alg: "HS256",
-    };
-    const headerEncoded = Buffer.from(JSON.stringify(header)).toString(
-      "base64url",
-    );
-    const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString(
-      "base64url",
-    );
-    let hash = createHmac("sha256", this.secret);
-    hash = hash.update(headerEncoded + "." + payloadEncoded);
-    const signature = hash.digest("base64url");
-    const token = headerEncoded + "." + payloadEncoded + "." + signature;
-    console.log({ token });
-  }
-  decode(token: string) {
-    // split the token
-    const tokenArray = token.split(".");
-    if (tokenArray.length !== 3) {
-      throw new AppError("Invalid token", "INVALID_TOKEN", 500);
-    }
-    const encodedHeader = tokenArray[0];
-    const encodedPayload = tokenArray[1];
-    const signature = tokenArray[2];
-    const data = encodedHeader + "." + encodedPayload;
-    const expectedSignature = createHmac("sha256", this.secret)
-      .update(data)
-      .digest("base64url");
-    console.log({
-      expectedSignature,
-      signature,
-      r: expectedSignature === signature,
-    });
-  }
-}
+  const jwt = new Jwt(secret);
+  fastify.decorate("jwt", jwt);
+  fastify.log.info("Registering JWT!!!!");
+};
+
+export default fp(jwtPlugin);

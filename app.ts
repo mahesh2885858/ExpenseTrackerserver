@@ -4,6 +4,7 @@ import createDatabasePlugin from "./plugins/createDatabasePlugin.ts";
 import user_registration from "./routes/register/register.route.ts";
 import AppError from "./utils/error.ts";
 import { DatabaseSync } from "node:sqlite";
+import createJWTPlugin from "./plugins/createJWTPlugin.ts";
 
 type buildOptions = {
   db: DatabaseSync;
@@ -59,6 +60,7 @@ async function buildServer(options: buildOptions) {
 
   const dataBasePlugin = await createDatabasePlugin(options.db);
   fastify.register(dataBasePlugin);
+  fastify.register(createJWTPlugin);
   fastify.route({
     method: "get",
     url: "/",

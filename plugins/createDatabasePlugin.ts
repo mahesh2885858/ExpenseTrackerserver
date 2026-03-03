@@ -1,10 +1,12 @@
 import { type FastifyPluginOptions, type FastifyInstance } from "fastify";
 import { DatabaseSync } from "node:sqlite";
 import fp from "fastify-plugin";
+import type Jwt from "../lib/jwt.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
     db: DatabaseSync;
+    jwt: Jwt;
   }
 }
 
