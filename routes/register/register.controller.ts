@@ -6,7 +6,7 @@ export async function registerController(
   req: FastifyRequest<{ Body: TRegisterBody }>,
   res: FastifyReply,
 ) {
-  const user = await register_user(req.server.db, req.body);
+  await register_user(req.server.db, req.body);
   return res.send({
     status: "success",
   });
