@@ -6,6 +6,7 @@ import {
   createUser,
   getUserByUsername,
 } from "../repositories/user.repository.ts";
+import { hashText } from "../utils/hashText.ts";
 
 export async function register_user(db: DatabaseSync, data: TRegisterBody) {
   const username = data.username;
@@ -35,9 +36,8 @@ export async function register_user(db: DatabaseSync, data: TRegisterBody) {
   }
 
   // we are good to go
-  const saltRounds = 5;
-  const salt = await bcrypt.genSalt(saltRounds);
-  const hash = await bcrypt.hash(password, salt);
+
+  const hash = await hashText(password);
 
   await createUser(db, {
     password: hash,

@@ -3,6 +3,8 @@ import AppError from "../utils/error.ts";
 import type { TLoginBody } from "../schemas/login.schema.ts";
 import { getUserByUsername } from "../repositories/user.repository.ts";
 import { DatabaseSync } from "node:sqlite";
+import { hashText } from "../utils/hashText.ts";
+import bcrypt from "bcrypt";
 
 async function LoginService(body: TLoginBody, db: DatabaseSync) {
   if (body.username?.length < MIN_USERNAME_LENGTH) {
@@ -24,7 +26,15 @@ async function LoginService(body: TLoginBody, db: DatabaseSync) {
   if (!existingUser) {
     throw new AppError("No user found with the given username", "NO_USER", 400);
   }
+
   // compare the passwords here
+  const actualPassword = existingUser.password;
+  const match = await bcrypt.compare(body.password, actualPassword as string);
+  if (match) {
+    return existingUser;
+  } else {
+    throw new AppError("Password is incorrect", "INCORRECT_PASSWORD", 400);
+  }
 }
 
 export default LoginService;
