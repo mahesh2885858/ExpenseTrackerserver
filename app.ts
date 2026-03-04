@@ -1,10 +1,11 @@
 import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify from "fastify";
 import createDatabasePlugin from "./plugins/createDatabasePlugin.ts";
-import user_registration from "./routes/register/register.route.ts";
+import user_registration from "./routes/register.route.ts";
 import AppError from "./utils/error.ts";
 import { DatabaseSync } from "node:sqlite";
 import createJWTPlugin from "./plugins/createJWTPlugin.ts";
+import { login_user } from "./routes/login.route.ts";
 
 type buildOptions = {
   db: DatabaseSync;
@@ -70,6 +71,7 @@ async function buildServer(options: buildOptions) {
   });
 
   fastify.register(user_registration);
+  fastify.register(login_user);
 
   return fastify;
 }

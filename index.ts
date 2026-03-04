@@ -10,7 +10,7 @@ const fastify = await buildServer({
   logger: true,
 });
 try {
-  fastify.listen({ port: parseInt(process.env.Port) || 3000 });
+  fastify.listen({ port: parseInt(process.env.PORT) || 3000 });
   await fastify.ready();
 } catch (err) {
   fastify.log.error(err);

@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { TRegisterBody } from "./register.schema.ts";
-import { register_user } from "./register.service.ts";
+import type { TRegisterBody } from "../schemas/register.schema.ts";
+import { register_user } from "../services/register.service.ts";
 
 export async function registerController(
   req: FastifyRequest<{ Body: TRegisterBody }>,
