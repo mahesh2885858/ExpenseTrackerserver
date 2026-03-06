@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test --experimental-test-coverage --watch ",
+    "test": "node --test --experimental-test-coverage --env-file=.env.test --watch ",
     "dev": "node --env-file=.env --watch index.ts",
     "migrate": "node db/prepareDb.ts"
   },

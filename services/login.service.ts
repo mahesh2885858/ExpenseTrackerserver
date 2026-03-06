@@ -12,14 +12,14 @@ async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
   if (body.username?.length < MIN_USERNAME_LENGTH) {
     throw new AppError(
       `Username should be minimum ${MIN_USERNAME_LENGTH} characters`,
-      "USERNAME_TO_SHORT",
+      "USERNAME_TO0_SHORT",
       400,
     );
   }
   if (body.username?.length > MAX_USERNAME_LENGTH) {
     throw new AppError(
-      `Username should not be more than ${MIN_USERNAME_LENGTH} characters`,
-      "USERNAME_TO_SHORT",
+      `Username should not be more than ${MAX_USERNAME_LENGTH} characters`,
+      "USERNAME_TO0_LONG",
       400,
     );
   }
@@ -42,7 +42,7 @@ async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
       token: refreshToken,
       userId: existingUser.id as number,
     });
-    console.log({ result });
+
     return {
       refreshToken,
       accessToken: token,
