@@ -4,8 +4,11 @@ import type { TLoginBody } from "../schemas/login.schema.ts";
 import { getUserByUsername } from "../repositories/user.repository.ts";
 import { DatabaseSync } from "node:sqlite";
 import bcrypt from "bcrypt";
+import type Jwt from "../lib/jwt.ts";
+import { randomUUID } from "node:crypto";
+import { insertNewRefreshToken } from "../repositories/refreshTokens.repository.ts";
 
-async function LoginService(body: TLoginBody, db: DatabaseSync) {
+async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
   if (body.username?.length < MIN_USERNAME_LENGTH) {
     throw new AppError(
       `Username should be minimum ${MIN_USERNAME_LENGTH} characters`,
@@ -30,7 +33,21 @@ async function LoginService(body: TLoginBody, db: DatabaseSync) {
   const actualPassword = existingUser.password;
   const match = await bcrypt.compare(body.password, actualPassword as string);
   if (match) {
-    return existingUser;
+    const token = jwt.encode({
+      name: existingUser.username,
+    });
+
+    const refreshToken = randomUUID();
+    const result = await insertNewRefreshToken(db, {
+      token: refreshToken,
+      userId: existingUser.id as number,
+    });
+    console.log({ result });
+    return {
+      refreshToken,
+      accessToken: token,
+      username: existingUser.username,
+    };
   } else {
     throw new AppError("Password is incorrect", "INCORRECT_PASSWORD", 400);
   }

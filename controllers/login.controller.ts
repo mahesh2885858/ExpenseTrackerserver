@@ -7,16 +7,10 @@ export async function LoginController(
   req: FastifyRequest<{ Body: TLoginBody }>,
   res: FastifyReply,
 ) {
-  const user = await LoginService(req.body, req.server.db);
-  const jwt = req.server.jwt;
-  const token = jwt.encode({
-    username: user.username,
-  });
-  const refreshToken = randomUUID();
-
-  return res.send({
-    name: user.name ?? "",
-    accessToken: token,
-    refreshToken,
-  });
+  const loginResults = await LoginService(
+    req.body,
+    req.server.db,
+    req.server.jwt,
+  );
+  return res.send(loginResults);
 }
