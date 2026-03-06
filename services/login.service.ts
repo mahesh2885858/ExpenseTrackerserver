@@ -3,7 +3,6 @@ import AppError from "../utils/error.ts";
 import type { TLoginBody } from "../schemas/login.schema.ts";
 import { getUserByUsername } from "../repositories/user.repository.ts";
 import { DatabaseSync } from "node:sqlite";
-import { hashText } from "../utils/hashText.ts";
 import bcrypt from "bcrypt";
 
 async function LoginService(body: TLoginBody, db: DatabaseSync) {

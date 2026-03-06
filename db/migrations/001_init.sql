@@ -1,6 +1,3 @@
-PRAGMA foreign_keys = ON;
-
-
 -- Create a Users table
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY,

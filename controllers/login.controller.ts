@@ -13,6 +13,7 @@ export async function LoginController(
     username: user.username,
   });
   const refreshToken = randomUUID();
+
   return res.send({
     name: user.name ?? "",
     accessToken: token,
