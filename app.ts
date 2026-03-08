@@ -19,7 +19,24 @@ async function buildServer(options: buildOptions) {
     logger: options.logger,
   }).withTypeProvider<TypeBoxTypeProvider>();
   if (options?.docs) {
-    await fastify.register(import("@fastify/swagger"));
+    await fastify.register(import("@fastify/swagger"), {
+      openapi: {
+        info: {
+          title: "Expense Tracker API",
+          version: "1.0.0",
+        },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              description: "some",
+              scheme: "bearer",
+              bearerFormat: "jwt",
+            },
+          },
+        },
+      },
+    });
 
     await fastify.register(import("@fastify/swagger-ui"), {
       routePrefix: "/documentation",
