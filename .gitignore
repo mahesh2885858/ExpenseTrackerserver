@@ -3,3 +3,6 @@ node_modules
 
 # database
 *.db
+
+# editor configs
+**.toml
