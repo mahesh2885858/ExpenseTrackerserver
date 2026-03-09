@@ -37,12 +37,13 @@ class Jwt {
     const expectedSignature = createHmac("sha256", this.secret)
       .update(data)
       .digest("base64url");
-    console.log({
-      expectedSignature,
-      signature,
-      r: expectedSignature === signature,
-    });
-    return expectedSignature === signature;
+
+    const decoded = Buffer.from(encodedPayload, "base64url").toString("utf-8");
+    const payload = JSON.parse(decoded);
+    return {
+      isValid: expectedSignature === signature,
+      payload,
+    };
   }
 }
 

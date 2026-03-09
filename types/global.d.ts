@@ -6,4 +6,9 @@ declare module "fastify" {
     db: DatabaseSync;
     jwt: Jwt;
   }
+  interface FastifyRequest {
+    user?: {
+      id: number;
+    };
+  }
 }

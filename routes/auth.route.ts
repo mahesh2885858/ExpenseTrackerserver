@@ -13,9 +13,14 @@ export const authRoute: FastifyPluginAsync = async (fastify, options) => {
       throw new Error("Invalid authentication scheme.");
     if (!token || token.length === 0)
       throw new AppError("Invalid token", "INVALID_TOKEN", 400);
-    const isValidToken = req.server.jwt.decode(token);
-    if (!isValidToken)
+    const { isValid, payload } = req.server.jwt.decode(token);
+    if (!isValid)
       throw new AppError("User not authenticated", "UNAUTHORIZED", 400);
+    if (!payload?.id)
+      throw new AppError("User not authenticated", "UNAUTHORIZED", 400);
+    req.user = {
+      id: payload.id,
+    };
   });
 
   fastify.register(transactionsRoute);

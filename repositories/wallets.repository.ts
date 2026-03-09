@@ -15,3 +15,8 @@ export const createWallet = (
 
   return stmt.run(body.name, initialBalance, body.userId);
 };
+
+export const getWalletsByUserId = (db: DatabaseSync, userId: number) => {
+  const stmt = db.prepare(`SELECT * FROM wallets WHERE user_id=?`);
+  return stmt.all(userId);
+};

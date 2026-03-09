@@ -25,3 +25,14 @@ export const createTransaction = (
     description ?? "",
   );
 };
+
+export const getTransactionsByUserId = (db: DatabaseSync, userId: number) => {
+  const stmt = db.prepare(
+    `
+    SELECT t.* FROM transactions t
+    JOIN wallets w ON t.wallet_id = w.id
+    WHERE w.user_id=?
+    `,
+  );
+  return stmt.all(userId);
+};

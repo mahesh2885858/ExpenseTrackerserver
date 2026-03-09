@@ -35,6 +35,7 @@ async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
   if (match) {
     const token = jwt.encode({
       name: existingUser.username,
+      id: existingUser.id,
     });
 
     const refreshToken = randomUUID();
@@ -47,6 +48,7 @@ async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
       refreshToken,
       accessToken: token,
       username: existingUser.username,
+      id: existingUser.id,
     };
   } else {
     throw new AppError("Password is incorrect", "INCORRECT_PASSWORD", 400);
