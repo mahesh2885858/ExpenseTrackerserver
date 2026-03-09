@@ -2,7 +2,7 @@ import { createHash, createHmac } from "node:crypto";
 import AppError from "../utils/error.ts";
 
 class Jwt {
-  secret: string;
+  private secret: string;
   constructor(secret: string) {
     this.secret = secret;
   }

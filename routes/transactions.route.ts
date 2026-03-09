@@ -4,7 +4,15 @@ export const transactionsRoute: FastifyPluginAsync = async (
   fastify,
   options,
 ) => {
-  fastify.get("/transactions", (req, res) => {
-    return res.send("getting transactions");
-  });
+  fastify.get(
+    "/transactions",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    (req, res) => {
+      return res.send("getting transactions");
+    },
+  );
 };
