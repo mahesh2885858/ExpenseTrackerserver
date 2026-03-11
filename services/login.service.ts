@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import type Jwt from "../lib/jwt.ts";
 import { randomUUID } from "node:crypto";
 import { insertNewRefreshToken } from "../repositories/refreshTokens.repository.ts";
+import { getCurrentUnixTimestamp } from "../utils/getCurrentUnixTimeStamp.ts";
 
 async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
   if (body.username?.length < MIN_USERNAME_LENGTH) {
@@ -34,8 +35,8 @@ async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
   const match = await bcrypt.compare(body.password, actualPassword as string);
   if (match) {
     const token = jwt.encode({
-      name: existingUser.username,
-      id: existingUser.id,
+      sub: existingUser.id as number,
+      iat: getCurrentUnixTimestamp(),
     });
 
     const refreshToken = randomUUID();
