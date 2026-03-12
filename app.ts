@@ -7,6 +7,7 @@ import { DatabaseSync } from "node:sqlite";
 import createJWTPlugin from "./plugins/createJWTPlugin.ts";
 import { login_user } from "./routes/login.route.ts";
 import { authRoute } from "./routes/auth.route.ts";
+import { refreshRoute } from "./routes/refresh.route.ts";
 
 type buildOptions = {
   db: DatabaseSync;
@@ -90,6 +91,7 @@ async function buildServer(options: buildOptions) {
 
   fastify.register(user_registration);
   fastify.register(login_user);
+  fastify.register(refreshRoute);
   fastify.register(authRoute);
 
   return fastify;

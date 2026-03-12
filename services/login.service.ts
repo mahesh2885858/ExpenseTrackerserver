@@ -1,4 +1,8 @@
-import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH } from "../lib/constants.ts";
+import {
+  MAX_USERNAME_LENGTH,
+  MIN_USERNAME_LENGTH,
+  REFRESH_TOKEN_EXPIRY_IN_SECONDS,
+} from "../lib/constants.ts";
 import AppError from "../utils/error.ts";
 import type { TLoginBody } from "../schemas/login.schema.ts";
 import { getUserByUsername } from "../repositories/user.repository.ts";
@@ -40,9 +44,11 @@ async function LoginService(body: TLoginBody, db: DatabaseSync, jwt: Jwt) {
     });
 
     const refreshToken = randomUUID();
-    const result = await insertNewRefreshToken(db, {
+    await insertNewRefreshToken(db, {
       token: refreshToken,
       userId: existingUser.id as number,
+      expires_at: getCurrentUnixTimestamp() + REFRESH_TOKEN_EXPIRY_IN_SECONDS,
+      created_at: getCurrentUnixTimestamp(),
     });
 
     return {
