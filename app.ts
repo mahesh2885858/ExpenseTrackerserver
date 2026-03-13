@@ -1,20 +1,43 @@
 import { type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify from "fastify";
-import sqlite from "./plugins/sqlite.ts";
-import user_registration from "./routes/register/register.route.ts";
+import createDatabasePlugin from "./plugins/createDatabasePlugin.ts";
+import user_registration from "./routes/register.route.ts";
 import AppError from "./utils/error.ts";
+import { DatabaseSync } from "node:sqlite";
+import createJWTPlugin from "./plugins/createJWTPlugin.ts";
+import { login_user } from "./routes/login.route.ts";
+import { authRoute } from "./routes/auth.route.ts";
+import { refreshRoute } from "./routes/refresh.route.ts";
 
 type buildOptions = {
-  db: string;
+  db: DatabaseSync;
   docs?: boolean;
+  logger: boolean;
 };
 
 async function buildServer(options: buildOptions) {
   const fastify = Fastify({
-    logger: true,
+    logger: options.logger,
   }).withTypeProvider<TypeBoxTypeProvider>();
   if (options?.docs) {
-    await fastify.register(import("@fastify/swagger"));
+    await fastify.register(import("@fastify/swagger"), {
+      openapi: {
+        info: {
+          title: "Expense Tracker API",
+          version: "1.0.0",
+        },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              description: "some",
+              scheme: "bearer",
+              bearerFormat: "jwt",
+            },
+          },
+        },
+      },
+    });
 
     await fastify.register(import("@fastify/swagger-ui"), {
       routePrefix: "/documentation",
@@ -51,11 +74,13 @@ async function buildServer(options: buildOptions) {
 
     return reply.status(500).send({
       status: "error",
-      message: "Internal Server Error",
+      message: error.message ? error.message : String(error),
     });
   });
-  const db = await sqlite(options.db);
-  fastify.register(db);
+
+  const dataBasePlugin = await createDatabasePlugin(options.db);
+  fastify.register(dataBasePlugin);
+  fastify.register(createJWTPlugin);
   fastify.route({
     method: "get",
     url: "/",
@@ -65,6 +90,9 @@ async function buildServer(options: buildOptions) {
   });
 
   fastify.register(user_registration);
+  fastify.register(login_user);
+  fastify.register(refreshRoute);
+  fastify.register(authRoute);
 
   return fastify;
 }

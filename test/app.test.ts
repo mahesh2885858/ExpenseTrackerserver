@@ -1,8 +1,10 @@
 import test, { type TestContext } from "node:test";
 import buildServer from "../app.ts";
 import AppError from "../utils/error.ts";
+import getTestDBInstance from "./getTestDb.ts";
 
-const app = await buildServer({ db: ":memory:" });
+const db = getTestDBInstance();
+const app = await buildServer({ db, logger: false });
 
 test('requesting the "/" route', async (t: TestContext) => {
   t.plan(1);
@@ -20,7 +22,7 @@ test('requesting the "/" route', async (t: TestContext) => {
 
 test("global App error handler", async (t: TestContext) => {
   t.plan(1);
-  const app = await buildServer({ db: ":memory:" });
+  const app = await buildServer({ db, logger: false });
   app.get("/throw-error", async () => {
     throw new AppError("Bad username", "BAD_USERNAME", 400);
   });
@@ -35,7 +37,7 @@ test("global App error handler", async (t: TestContext) => {
 
 test("global unknown error handler", async (t: TestContext) => {
   t.plan(1);
-  const app = await buildServer({ db: ":memory:" });
+  const app = await buildServer({ db, logger: false });
   app.get("/throw-unknown-error", async () => {
     throw new Error("Unknown error");
   });

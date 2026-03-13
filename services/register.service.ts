@@ -1,8 +1,12 @@
 import { DatabaseSync } from "node:sqlite";
 import bcrypt from "bcrypt";
-import AppError from "../../utils/error.ts";
-import { type TRegisterBody } from "./register.schema.ts";
-import { createUser } from "./register.queries.ts";
+import AppError from "../utils/error.ts";
+import { type TRegisterBody } from "../schemas/register.schema.ts";
+import {
+  createUser,
+  getUserByUsername,
+} from "../repositories/user.repository.ts";
+import { hashText } from "../utils/hashText.ts";
 
 export async function register_user(db: DatabaseSync, data: TRegisterBody) {
   const username = data.username;
@@ -25,16 +29,15 @@ export async function register_user(db: DatabaseSync, data: TRegisterBody) {
   }
 
   // check db for existing username
-  const checkStmt = db.prepare("SELECT 1 FROM users WHERE username = ?");
-  const exists = checkStmt.get(username);
+
+  const exists = await getUserByUsername(db, username);
   if (exists) {
     throw new AppError("Username is already used", "USER_EXIST", 400);
   }
 
   // we are good to go
-  const saltRounds = 5;
-  const salt = await bcrypt.genSalt(saltRounds);
-  const hash = await bcrypt.hash(password, salt);
+
+  const hash = await hashText(password);
 
   await createUser(db, {
     password: hash,
