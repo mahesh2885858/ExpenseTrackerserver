@@ -29,6 +29,6 @@ export async function markTokenAsRevoked(token: string, db: DatabaseSync) {
 }
 
 export async function getExistingTokenByToken(token: string, db: DatabaseSync) {
-  const getStmt = db.prepare(`SELECT 1 FROM refresh_tokens WHERE token=?`);
+  const getStmt = db.prepare(`SELECT * FROM refresh_tokens WHERE token=?`);
   return getStmt.get(token);
 }

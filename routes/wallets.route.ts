@@ -1,9 +1,10 @@
 import { type FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
-import { WalletBodySchema } from "../schemas/wallets.schema.ts";
+import { walletController } from "../controllers/wallets.controller.ts";
 import {
-  getWalletsController,
-  postWalletController,
-} from "../controllers/wallets.controller.ts";
+  WalletBodySchema,
+  walletReqParamsSchema,
+  WalletUpdateBodySchema,
+} from "../schemas/wallets.schema.ts";
 
 export const walletsRoute: FastifyPluginAsyncTypebox = async (
   fasity,
@@ -16,11 +17,32 @@ export const walletsRoute: FastifyPluginAsyncTypebox = async (
         security: [{ bearerAuth: [] }],
       },
     },
-    getWalletsController,
+    walletController.getWallets,
   );
   fasity.post(
     "/wallets",
     { schema: { body: WalletBodySchema, security: [{ bearerAuth: [] }] } },
-    postWalletController,
+    walletController.createWallet,
+  );
+  fasity.get(
+    "/wallets/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: walletReqParamsSchema,
+      },
+    },
+    walletController.getWalletById,
+  );
+  fasity.patch(
+    "/wallets/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: walletReqParamsSchema,
+        body: WalletUpdateBodySchema,
+      },
+    },
+    walletController.updateWallet,
   );
 };
