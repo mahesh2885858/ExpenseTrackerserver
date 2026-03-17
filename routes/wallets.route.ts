@@ -2,15 +2,16 @@ import { type FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
 import { walletController } from "../controllers/wallets.controller.ts";
 import {
   WalletBodySchema,
+  walletDeleteParamsSchema,
   walletReqParamsSchema,
   WalletUpdateBodySchema,
 } from "../schemas/wallets.schema.ts";
 
 export const walletsRoute: FastifyPluginAsyncTypebox = async (
-  fasity,
+  fastify,
   options,
 ) => {
-  fasity.get(
+  fastify.get(
     "/wallets",
     {
       schema: {
@@ -19,12 +20,12 @@ export const walletsRoute: FastifyPluginAsyncTypebox = async (
     },
     walletController.getWallets,
   );
-  fasity.post(
+  fastify.post(
     "/wallets",
     { schema: { body: WalletBodySchema, security: [{ bearerAuth: [] }] } },
     walletController.createWallet,
   );
-  fasity.get(
+  fastify.get(
     "/wallets/:id",
     {
       schema: {
@@ -34,7 +35,7 @@ export const walletsRoute: FastifyPluginAsyncTypebox = async (
     },
     walletController.getWalletById,
   );
-  fasity.patch(
+  fastify.patch(
     "/wallets/:id",
     {
       schema: {
@@ -44,5 +45,15 @@ export const walletsRoute: FastifyPluginAsyncTypebox = async (
       },
     },
     walletController.updateWallet,
+  );
+  fastify.delete(
+    "/wallets/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: walletDeleteParamsSchema,
+      },
+    },
+    walletController.deleteWallet,
   );
 };

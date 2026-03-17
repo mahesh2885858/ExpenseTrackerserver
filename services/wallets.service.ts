@@ -5,6 +5,7 @@ import type {
 } from "../schemas/wallets.schema.ts";
 import {
   createWallet,
+  deleteWalletById,
   getWalletById,
   getWalletsByUserId,
   updateWalletById,
@@ -70,4 +71,8 @@ export const updateWallet = async (
   }
 
   return updateWalletById(db, id, allowedBody);
+};
+
+export const removeWallet = async (id: number, db: DatabaseSync) => {
+  return deleteWalletById(id, db);
 };

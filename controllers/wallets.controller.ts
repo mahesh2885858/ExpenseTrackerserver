@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type {
+  TDeleteWalletParams,
   TParamsWallet,
   TWalletBody,
   TWalletUpdateBody,
@@ -8,6 +9,7 @@ import {
   createWalletService,
   getWallet,
   getWalletsByUser,
+  removeWallet,
   updateWallet,
 } from "../services/wallets.service.ts";
 
@@ -48,9 +50,17 @@ export const patchWallet = async (
   return await updateWallet(req.params.id, req.body, req.server.db);
 };
 
+const removeWalletController = async (
+  req: FastifyRequest<{ Params: TDeleteWalletParams }>,
+  res: FastifyReply,
+) => {
+  return await removeWallet(req.params.id, req.server.db);
+};
+
 export const walletController = {
   createWallet: postWalletController,
   getWallets: getWalletsController,
   getWalletById: getWalletController,
   updateWallet: patchWallet,
+  deleteWallet: removeWalletController,
 };

@@ -46,3 +46,8 @@ export const updateWalletById = (
   const updateStmt = db.prepare(sql);
   return updateStmt.get(...values);
 };
+
+export const deleteWalletById = (id: number, db: DatabaseSync) => {
+  const deleteStmt = db.prepare(`DELETE FROM wallets WHERE id=?`);
+  return deleteStmt.run(id);
+};

@@ -17,3 +17,8 @@ export const WalletUpdateBodySchema = Type.Object({
 });
 
 export type TWalletUpdateBody = Static<typeof WalletUpdateBodySchema>;
+
+export const walletDeleteParamsSchema = Type.Object({
+  id: Type.Number(),
+});
+export type TDeleteWalletParams = Static<typeof walletReqParamsSchema>;
