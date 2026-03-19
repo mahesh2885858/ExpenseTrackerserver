@@ -1,6 +1,6 @@
 import { type SQLInputValue, type DatabaseSync } from "node:sqlite";
 
-export const createWallet = (
+const createWallet = (
   db: DatabaseSync,
   body: {
     name: string;
@@ -16,21 +16,17 @@ export const createWallet = (
   return stmt.run(body.name, initialBalance, body.userId);
 };
 
-export const getWalletsByUserId = (db: DatabaseSync, userId: number) => {
+const getWalletsByUserId = (db: DatabaseSync, userId: number) => {
   const stmt = db.prepare(`SELECT * FROM wallets WHERE user_id=?`);
   return stmt.all(userId);
 };
 
-export const getWalletById = (db: DatabaseSync, id: number) => {
-  const stmt = db.prepare(`SELECT 1 FROM wallets WHERE id=?`);
+const getWalletById = (db: DatabaseSync, id: number) => {
+  const stmt = db.prepare(`SELECT * FROM wallets WHERE id=?`);
   return stmt.get(id);
 };
 
-export const updateWalletById = (
-  db: DatabaseSync,
-  id: number,
-  body: Partial<{}>,
-) => {
+const updateWalletById = (db: DatabaseSync, id: number, body: Partial<{}>) => {
   const fields = [];
   const values: SQLInputValue[] = [];
   for (const [key, value] of Object.entries(body)) {
@@ -47,7 +43,15 @@ export const updateWalletById = (
   return updateStmt.get(...values);
 };
 
-export const deleteWalletById = (id: number, db: DatabaseSync) => {
+const deleteWalletById = (id: number, db: DatabaseSync) => {
   const deleteStmt = db.prepare(`DELETE FROM wallets WHERE id=?`);
   return deleteStmt.run(id);
+};
+
+export const walletRepository = {
+  create: createWallet,
+  getById: getWalletById,
+  getByUser: getWalletsByUserId,
+  patch: updateWalletById,
+  remove: deleteWalletById,
 };

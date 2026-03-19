@@ -3,40 +3,34 @@ import type {
   TWalletBody,
   TWalletUpdateBody,
 } from "../schemas/wallets.schema.ts";
-import {
-  createWallet,
-  deleteWalletById,
-  getWalletById,
-  getWalletsByUserId,
-  updateWalletById,
-} from "../repositories/wallets.repository.ts";
+import { walletRepository } from "../repositories/wallets.repository.ts";
 import AppError from "../utils/error.ts";
 import {
   MAX_WALLET_NAME_LENGTH,
   MIN_WALLET_NAME_LENGTH,
 } from "../lib/constants.ts";
 
-export const createWalletService = async (
+const createWalletService = async (
   wallet: TWalletBody,
   userId: number,
   db: DatabaseSync,
 ) => {
-  return createWallet(db, {
+  return walletRepository.create(db, {
     name: wallet.name,
     userId,
     initialBalance: wallet.initialBalance ?? 0,
   });
 };
 
-export const getWalletsByUser = async (userId: number, db: DatabaseSync) => {
-  return getWalletsByUserId(db, userId);
+const getWalletsByUser = async (userId: number, db: DatabaseSync) => {
+  return walletRepository.getByUser(db, userId);
 };
 
-export const getWallet = async (id: number, db: DatabaseSync) => {
-  return getWalletById(db, id);
+const getWallet = async (id: number, db: DatabaseSync) => {
+  return walletRepository.getById(db, id);
 };
 
-export const updateWallet = async (
+const updateWallet = async (
   id: number,
   body: TWalletUpdateBody,
   db: DatabaseSync,
@@ -70,9 +64,27 @@ export const updateWallet = async (
     }
   }
 
-  return updateWalletById(db, id, allowedBody);
+  const exist = walletRepository.getById(db, id);
+
+  if (!exist) {
+    throw new AppError(
+      "No wallet found with the given id",
+      "WALLET_NOT_FOUND",
+      400,
+    );
+  }
+
+  return walletRepository.patch(db, id, allowedBody);
 };
 
-export const removeWallet = async (id: number, db: DatabaseSync) => {
-  return deleteWalletById(id, db);
+const removeWallet = async (id: number, db: DatabaseSync) => {
+  return walletRepository.remove(id, db);
+};
+
+export const walletService = {
+  getById: getWallet,
+  getByUser: getWalletsByUser,
+  patch: updateWallet,
+  remove: removeWallet,
+  create: createWalletService,
 };

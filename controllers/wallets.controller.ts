@@ -5,13 +5,7 @@ import type {
   TWalletBody,
   TWalletUpdateBody,
 } from "../schemas/wallets.schema.ts";
-import {
-  createWalletService,
-  getWallet,
-  getWalletsByUser,
-  removeWallet,
-  updateWallet,
-} from "../services/wallets.service.ts";
+import { walletService } from "../services/wallets.service.ts";
 
 export const postWalletController = async (
   req: FastifyRequest<{
@@ -32,7 +26,7 @@ export const getWalletsController = async (
   res: FastifyReply,
 ) => {
   // Todo validate input
-  const wallets = await getWalletsByUser(req.user.id, req.server.db);
+  const wallets = await walletService.getByUser(req.user.id, req.server.db);
   return wallets;
 };
 
@@ -40,21 +34,21 @@ export const getWalletController = async (
   req: FastifyRequest<{ Params: TParamsWallet }>,
   res: FastifyReply,
 ) => {
-  return await getWallet(req.params.id, req.server.db);
+  return await walletService.getById(req.params.id, req.server.db);
 };
 
 export const patchWallet = async (
   req: FastifyRequest<{ Params: TParamsWallet; Body: TWalletUpdateBody }>,
   res: FastifyReply,
 ) => {
-  return await updateWallet(req.params.id, req.body, req.server.db);
+  return await walletService.patch(req.params.id, req.body, req.server.db);
 };
 
 const removeWalletController = async (
   req: FastifyRequest<{ Params: TDeleteWalletParams }>,
   res: FastifyReply,
 ) => {
-  return await removeWallet(req.params.id, req.server.db);
+  return await walletService.remove(req.params.id, req.server.db);
 };
 
 export const walletController = {

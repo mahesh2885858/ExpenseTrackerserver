@@ -1,9 +1,11 @@
 import { type FastifyPluginAsync } from "fastify";
+import { transactionsController } from "../controllers/transactions.controller.ts";
 import {
-  getTransactionController,
-  postTransactionController,
-} from "../controllers/transactions.controller.ts";
-import { TransactionBodySchema } from "../schemas/transactions.schema.ts";
+  GetTransactionParamsSchema,
+  RemoveTransactionParamsSchema,
+  TransactionBodySchema,
+  TransactionUpdateParamsSchema,
+} from "../schemas/transactions.schema.ts";
 
 export const transactionsRoute: FastifyPluginAsync = async (
   fastify,
@@ -16,7 +18,7 @@ export const transactionsRoute: FastifyPluginAsync = async (
         security: [{ bearerAuth: [] }],
       },
     },
-    getTransactionController,
+    transactionsController.get,
   );
   fastify.post(
     "/transactions",
@@ -26,6 +28,37 @@ export const transactionsRoute: FastifyPluginAsync = async (
         security: [{ bearerAuth: [] }],
       },
     },
-    postTransactionController,
+    transactionsController.create,
+  );
+  fastify.get(
+    "/transactions/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: GetTransactionParamsSchema,
+      },
+    },
+    transactionsController.getById,
+  );
+  fastify.patch(
+    "/transactions/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: TransactionUpdateParamsSchema,
+        body: TransactionBodySchema,
+      },
+    },
+    transactionsController.patch,
+  );
+  fastify.delete(
+    "/transactions/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: RemoveTransactionParamsSchema,
+      },
+    },
+    transactionsController.remove,
   );
 };
