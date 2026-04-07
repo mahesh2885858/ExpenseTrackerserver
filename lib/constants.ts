@@ -7,3 +7,5 @@ export const REFRESH_TOKEN_EXPIRY_IN_SECONDS = 30 * 24 * 60 * 60;
 export const MAX_AMOUNT = 1000000000;
 export const MAX_WALLET_NAME_LENGTH = 20;
 export const MIN_WALLET_NAME_LENGTH = 3;
+export const MIN_NAME_LENGTH = 3;
+export const MAX_NAME_LENGTH = 20;
