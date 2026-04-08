@@ -8,6 +8,8 @@ import createJWTPlugin from "./plugins/createJWTPlugin.ts";
 import { login_user } from "./routes/login.route.ts";
 import { authRoute } from "./routes/auth.route.ts";
 import { refreshRoute } from "./routes/refresh.route.ts";
+import { forgetPasswordController } from "./controllers/forgetPassword.controller.ts";
+import { forget_password_route } from "./routes/forgetPassword.route.ts";
 
 type buildOptions = {
   db: DatabaseSync;
@@ -92,6 +94,7 @@ async function buildServer(options: buildOptions) {
   fastify.register(user_registration);
   fastify.register(login_user);
   fastify.register(refreshRoute);
+  fastify.register(forget_password_route);
   fastify.register(authRoute);
 
   return fastify;

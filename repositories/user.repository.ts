@@ -23,6 +23,11 @@ export async function getByUserId(db: DatabaseSync, userId: number) {
   return stmt.get(userId);
 }
 
+export async function getUserByEmail(db: DatabaseSync, email: string) {
+  const stmt = db.prepare(`SELECT * FROM users WHERE email = ?`)
+  return stmt.get(email)
+}
+
 const updateUserById = (db: DatabaseSync, id: number, body: Partial<{}>) => {
   const fields = [];
   const values: SQLInputValue[] = [];
@@ -40,5 +45,6 @@ export const usersRepository = {
   create: createUser,
   getByUsername: getUserByUsername,
   getById: getByUserId,
-  patch:updateUserById
+  patch: updateUserById,
+  getByEmail:getUserByEmail
 };
