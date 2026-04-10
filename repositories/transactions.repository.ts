@@ -1,6 +1,7 @@
-import { type DatabaseSync } from "node:sqlite";
+import { type SQLInputValue, type DatabaseSync } from "node:sqlite";
+import { type TTransactionUpdateBody } from "../schemas/transactions.schema.ts";
 
-export const createTransaction = (
+const createTransaction = (
   db: DatabaseSync,
   body: {
     walletID: number;
@@ -26,7 +27,7 @@ export const createTransaction = (
   );
 };
 
-export const getTransactionsByUserId = (db: DatabaseSync, userId: number) => {
+const getTransactionsByUserId = (db: DatabaseSync, userId: number) => {
   const stmt = db.prepare(
     `
     SELECT t.* FROM transactions t
@@ -35,4 +36,45 @@ export const getTransactionsByUserId = (db: DatabaseSync, userId: number) => {
     `,
   );
   return stmt.all(userId);
+};
+
+const getTransactionById = (db: DatabaseSync, Id: number) => {
+  const stmt = db.prepare(
+    `
+    SELECT * FROM transactions t
+    WHERE t.id=?
+    `,
+  );
+  return stmt.get(Id);
+};
+
+const patchTransaction = (
+  db: DatabaseSync,
+  id: number,
+  data: TTransactionUpdateBody,
+) => {
+  const fields = [];
+  const values: SQLInputValue[] = [];
+  for (const [key, value] of Object.entries(data)) {
+    fields.push(`${key}=?`);
+    values.push(value as string | number);
+  }
+  values.push(id);
+  const sql = `UPDATE transactions SET ${fields.join(", ")} WHERE id=? RETURNING *`;
+  console.log(sql);
+  const updateStmt = db.prepare(sql);
+  return updateStmt.get(...values);
+};
+
+const removeTransaction = (id: number, db: DatabaseSync) => {
+  const deleteStmt = db.prepare(`DELETE FROM transactions WHERE id=?`);
+  return deleteStmt.run(id);
+};
+
+export const transactionsRepository = {
+  create: createTransaction,
+  getByUserId: getTransactionsByUserId,
+  getById: getTransactionById,
+  patch: patchTransaction,
+  remove: removeTransaction,
 };

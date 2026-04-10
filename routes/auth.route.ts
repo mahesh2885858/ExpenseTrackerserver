@@ -2,6 +2,7 @@ import { type FastifyPluginAsync } from "fastify";
 import { transactionsRoute } from "./transactions.route.ts";
 import { walletsRoute } from "./wallets.route.ts";
 import AppError from "../utils/error.ts";
+import { userRoute } from "./user.route.ts";
 
 export const authRoute: FastifyPluginAsync = async (fastify, options) => {
   fastify.addHook("preHandler", async (req, res) => {
@@ -28,6 +29,7 @@ export const authRoute: FastifyPluginAsync = async (fastify, options) => {
     };
   });
 
+  fastify.register(userRoute)
   fastify.register(transactionsRoute);
   fastify.register(walletsRoute);
 };

@@ -1,26 +1,59 @@
 import { type FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
-import { WalletBodySchema } from "../schemas/wallets.schema.ts";
+import { walletController } from "../controllers/wallets.controller.ts";
 import {
-  getWalletsController,
-  postWalletController,
-} from "../controllers/wallets.controller.ts";
+  WalletBodySchema,
+  walletDeleteParamsSchema,
+  walletReqParamsSchema,
+  WalletUpdateBodySchema,
+} from "../schemas/wallets.schema.ts";
 
 export const walletsRoute: FastifyPluginAsyncTypebox = async (
-  fasity,
+  fastify,
   options,
 ) => {
-  fasity.get(
+  fastify.get(
     "/wallets",
     {
       schema: {
         security: [{ bearerAuth: [] }],
       },
     },
-    getWalletsController,
+    walletController.getWallets,
   );
-  fasity.post(
+  fastify.post(
     "/wallets",
     { schema: { body: WalletBodySchema, security: [{ bearerAuth: [] }] } },
-    postWalletController,
+    walletController.createWallet,
+  );
+  fastify.get(
+    "/wallets/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: walletReqParamsSchema,
+      },
+    },
+    walletController.getWalletById,
+  );
+  fastify.patch(
+    "/wallets/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: walletReqParamsSchema,
+        body: WalletUpdateBodySchema,
+      },
+    },
+    walletController.updateWallet,
+  );
+  fastify.delete(
+    "/wallets/:id",
+    {
+      schema: {
+        security: [{ bearerAuth: [] }],
+        params: walletDeleteParamsSchema,
+      },
+    },
+    walletController.deleteWallet,
   );
 };

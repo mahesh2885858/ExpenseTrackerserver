@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS transactions(
     created_at TEXT NOT NULL,
     transaction_date TEXT NOT NULL,
     description TEXT DEFAULT NULL,
-    FOREIGN KEY (wallet_id) REFERENCES wallets(id)
+    FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE
 );

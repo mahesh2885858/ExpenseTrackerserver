@@ -10,5 +10,6 @@ Admin, Authenticated user
 
 - Registration
 - Login
+- Forget/reset password (Todo)
 - JWT/Auth
 - CRUD expenses
