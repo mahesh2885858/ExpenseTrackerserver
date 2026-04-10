@@ -27,8 +27,13 @@ const createNewToken = async (db: DatabaseSync, tokenHash: string,userId:number)
   return stmt.run(tokenHash, now, userId, "LINK_SENT",expiry)
 }
 
+const getByTokenHash = async (db: DatabaseSync, tokenHash: string) => {
+  const stmt = db.prepare(`SELECT * FROM TABLE ${table} WHERE token_hash = ?`)
+  return stmt.get(tokenHash)
+}
 export const forgetTokenRepository = {
   getByUserId,
   markTokenAsUsed,
-  createNewToken
+  createNewToken,
+  getByTokenHash
 }
